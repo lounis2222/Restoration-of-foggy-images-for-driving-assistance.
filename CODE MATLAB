@@ -1,0 +1,334 @@
+clear all
+close all
+clc
+%%  Q1 ET Q2 SONT Présentes dans le compte rendu.
+
+%%
+%%%%%%   Q 3 )
+
+Im_orig= imread('F00.png'); % Pour Lire notre première image originale à partir du fichier graphique.
+
+figure();
+imshow(Im_orig);   % Afficher notre image originale non
+%  restaurée.
+
+% imshow suppose par défaut que ses entrées sont [0-1]. Ainsi, lorsqu'on lui lui donne des données [0-255],
+% toutes les valeurs au-dessus de 1 sont affichées en blanc. Il existe une solution simple:
+
+redim= double(Im_orig)/255;    %  pour redimensionner les intensités à [0, 1]
+
+figure();
+imshow(redim)     % Affichage de l'image redimentionnée
+
+% On a donc une image brute qui a du brouillard et bruitée.
+
+
+% On va donc estimer l'intensité du ciel avec  ( On va donc avoir une seule
+% valeur pour Is) 
+% Quand on voit l'image on voit que l'intensité du ciel varie selon
+% l'endroit mais ce qu'on cherche c'est de choisir une valeur parmi toutes
+% ces possibilités.
+% On pourra utiliser le MAX ou d’autre méthodes comme le Médian ou mean (Moyenne). 
+% Ce n’est pas vraiment intéressant de travailler sur toute l’image car il y a des objets qui sont lumineux dans l’image
+% et qui ne sont pas dans le ciel, on pourra donc choisir quelques lignes:
+
+% Dans cette partie on optera pour la moyenne ( Mean) : 
+
+
+% Is=mean(mean(redim(1:50,:))); % Prendre la moyenne des moyennes des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante ( J'ai essayé avec
+% cette méthode au début je n'ai pas obtenue une bonne restauration d'image
+% car on a une sorte d'intensité blanche visible au centre de l'image en
+% haut.
+
+% j'ai donc opté pour la méthode max) qui est 
+
+Is=max(max(redim(1:50,:))) % Prendre le maximum des maximums des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante 
+
+%%
+%%%%%%%%%%%% Q4 )
+% Dans cette partie on va estimer voile de l'image par le biais d'un filtre median qui nous permettra d'éradier les objets
+% blancs qui ne peuvent pas être dus au brouillard comme les voitures, les marquages, ... 
+Im_med = medfilt2(redim,[60,20],'symmetric'); % filtrer notre image avec le filtre median 2D avec une largeur définie
+figure();
+imshow(Im_med); % Afficher l'image lissée avec le filtre median
+title('Image lissée avec le filtre Médian');
+A=min(Im_med,redim); % Calculer le minimum entre l'image lissée et l'image originale
+
+B=min(A,Is*ones(size(A)));
+voile= B*0.95; % Notre voile est approximativement 95% d ece minimum.
+figure();
+imshow(voile); % Afficher notre voile.
+title(' Voile correspondant à notre image FOO')
+%%
+%%%%%%%%%%%%%% Q5 )
+%On Calcule l'image après la restauration des contrastes 
+
+%On utilisera donc lµéquation obtenue dans la question 2 après inversion de la loi koschmeider 
+I0= Is.*(redim-voile)./(Is - voile);
+figure();
+subplot(2,2,1);
+imshow(redim) % Afficher l'image originale FOO
+title('IMAGE originale FOO')
+subplot(2,2,2);
+imshow(I0) % Afficher l'image  FOO après restauration des contrastes
+title('IMAGE FOO après restauration des contrastes');
+% On a ainsi reussi à restaurer notre image mais on doit augmenter de son
+% intensité car elle est un peu sombre comparé à l'originale (c'est ce
+% qu'on va faire dans la question 6).
+
+%%
+
+%%%%%%%%%%% Q6 )
+% On appliquea donc une puissance sur l'intensité (transformation gamma) afin de
+%corriger l4assombrissement de l'image:
+
+Im_gam=I0.*1.5; % On augemntera l'intensité de notre image restaurée avec un coefficient 
+%Gamma= 1.5 
+
+figure();
+subplot(2,2,1);
+imshow(I0) % % Afficher l'image  FOO après restauration des contrastes
+title('IMAGE FOO restaurée')
+subplot(2,2,2)
+imshow(Im_gam);% Afficher notre image restaurée augmentée en intensité avec la transformation
+% gamma
+title('Image FOO restaurée avec gamma ');
+
+%%
+
+%%%%%%%%%%%% Q7)
+
+% On applique les mêmes operations pour l'image "F01":
+
+
+Im_orig1= imread('F01.png'); % Pour Lire notre deuxième image originale à partir du fichier graphique.
+
+figure();
+imshow(Im_orig1);   % Afficher notre image originale non
+%  restaurée.
+
+% imshow suppose par défaut que ses entrées sont [0-1]. Ainsi, lorsqu'on lui lui donne des données [0-255],
+% toutes les valeurs au-dessus de 1 sont affichées en blanc. Il existe une solution simple:
+
+redim1= double(Im_orig1)/255;    %  pour redimensionner les intensités à [0, 1]
+
+figure();
+imshow(redim1)     % Affichage de l'image redimentionnée
+
+% On a donc une image brute qui a du brouillard et bruitée.
+
+
+% On va donc estimer l'intensité du ciel avec  ( On va donc avoir une seule
+% valeur pour Is) 
+% Quand on voit l'image on voit que l'intensité du ciel varie selon
+% l'endroit mais ce qu'on cherche c'est de choisir une valeur parmi toutes
+% ces possibilités.
+% On pourra utiliser le MAX ou d’autre méthodes comme le Médian ou mean (Moyenne). 
+% Ce n’est pas vraiment intéressant de travailler sur toute l’image car il y a des objets qui sont lumineux dans l’image
+% et qui ne sont pas dans le ciel, on pourra donc choisir quelques lignes:
+
+% Dans cette partie on optera pour la moyenne ( Mean) : 
+
+
+% Is1=mean(mean(redim1(1:50,:))); % Prendre la moyenne des moyennes des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante ( J'ai essayé avec
+% cette méthode au début je n'ai pas obtenue une bonne restauration d'image
+% car on a une sorte d'intensité blanche visible au centre de l'image en
+% haut.
+
+% j'ai donc opté pour la méthode max) qui est 
+
+Is1=max(max(redim1(1:50,:))) % Prendre le maximum des maximums des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante 
+
+% Dans cette partie on va estimer voile de l'image par le biais d'un filtre median qui nous permettra d'éradier les objets
+% blancs qui ne peuvent pas être dus au brouillard comme les voitures, les marquages, ... 
+Im_med1 = medfilt2(redim1,[60,20],'symmetric'); % filtrer notre image avec le filtre median 2D avec une largeur définie
+figure();
+imshow(Im_med1); % Afficher l'image lissée avec le filtre median
+title('Image lissée avec le filtre Médian');
+A1=min(Im_med1,redim1); % Calculer le minimum entre l'image lissée et l'image originale
+
+B1=min(A1,Is*ones(size(A1)));
+voile1= B1*0.95; % Notre voile est approximativement 95% d ece minimum.
+figure();
+imshow(voile1); % Afficher notre voile.
+title(' Voile correspondant à notre image F01')
+
+%On Calcule l'image après la restauration des contrastes 
+
+%On utilisera donc lµéquation obtenue dans la question 2 après inversion de la loi koschmeider 
+I01= Is1.*(redim1-voile1)./(Is1 - voile1);
+figure();
+subplot(2,2,1);
+imshow(redim1) % Afficher l'image originale F01
+title('IMAGE originale F01')
+subplot(2,2,2);
+imshow(I01) % Afficher l'image  F01 après restauration des contrastes
+title('IMAGE F01 après restauration des contrastes');
+% On a ainsi reussi à restaurer notre image mais on doit augmenter de son
+% intensité car elle est un peu sombre comparé à l'originale (c'est ce
+% qu'on va faire dans la question 6).
+
+% On appliquea donc une puissance sur l'intensité (transformation gamma) afin de
+%corriger l'assombrissement de l'image:
+
+Im_gam1=I01.*1.5; % On augemntera l'intensité de notre image restaurée avec un coefficient 
+%Gamma= 1.5 
+
+figure();
+subplot(2,2,1);
+imshow(I01) % % Afficher l'image  F01 après restauration des contrastes
+title('IMAGE F01 restaurée')
+subplot(2,2,2)
+imshow(Im_gam1);% Afficher notre image restaurée augmentée en intensité avec la transformation
+% gamma
+title('Image F01 restaurée avec gamma ');
+
+%On obtient une image bien restaurée car bien qu'on ait gardé les anciens paramètres, on a 
+%recalculé l'intensité du ciel Is1 selon l'image « F001 » .
+%%
+
+%%%%%%% Q8) 
+
+%%%%%%%%On applique les mêmes operations pour l'image "F02":
+
+Im_orig2= imread('F02.png'); % Pour Lire notre troisième image originale à partir du fichier graphique.
+
+figure();
+imshow(Im_orig2);   % Afficher notre image originale non
+%  restaurée.
+
+% imshow suppose par défaut que ses entrées sont [0-1]. Ainsi, lorsqu'on lui lui donne des données [0-255],
+% toutes les valeurs au-dessus de 1 sont affichées en blanc. Il exIs2te une solution simple:
+
+redim2= double(Im_orig2)/255;    %  pour redimensionner les intensités à [0, 1]
+
+figure();
+imshow(redim2)     % Affichage de l'image redimentionnée
+
+% On a donc une image brute qui a du brouillard et bruitée.
+
+
+% On va donc estimer l'intensité du ciel avec  ( On va donc avoir une seule
+% valeur pour Is2) 
+% Quand on voit l'image on voit que l'intensité du ciel varie selon
+% l'endroit maIs2 ce qu'on cherche c'est de choIs2ir une valeur parmi toutes
+% ces possibilités.
+% On pourra utilIs2er le MAX ou d’autre méthodes comme le Médian ou mean (Moyenne). 
+% Ce n’est pas vraiment intéressant de travailler sur toute l’image car il y a des objets qui sont lumineux dans l’image
+% et qui ne sont pas dans le ciel, on pourra donc choIs2ir quelques lignes:
+
+% Dans cette partie on optera pour la moyenne ( Mean) : 
+
+
+% Is2=mean(mean(redim2(1:50,:))); % Prendre la moyenne des moyennes des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante ( J'ai essayé avec
+% cette méthode au début je n'ai pas obtenue une bonne restauration d'image
+% car on a une sorte d'intensité blanche vIs2ible au centre de l'image en
+% haut.
+
+% j'ai donc opté pour la méthode max) qui est 
+
+Is2=max(max(redim2(1:50,:))) % Prendre le maximum des maximums des 50 premières lignes et de toutes les colonnes pour ainsi 
+% avoir la valeur de l'intensité du ciel correspondante 
+%Dans cette partie on va estimer voile de l'image par le biais d'un filtre median qui nous permettra d'éradier les objets
+% blancs qui ne peuvent pas être dus au brouillard comme les voitures, les marquages, ... 
+Im_med2 = medfilt2(redim2,[60,20],'symmetric'); % filtrer notre image avec le filtre median 2D avec une largeur définie
+figure();
+imshow(Im_med2); % Afficher l'image lIsSsée avec le filtre median
+title('Image lissée avec le filtre Médian');
+A2=min(Im_med2,redim2); % Calculer le minimum entre l'image Lisssée et l'image originale
+
+B2=min(A2,Is2*ones(size(A2)));
+voile2= B2*0.95; % Notre voile est approximativement 95% d ece minimum.
+figure();
+imshow(voile2); % Afficher notre voile.
+title(' Voile correspondant à notre image F02')
+
+
+%On Calcule l'image après la restauration des contrastes 
+
+%On utilIs2era donc lµéquation obtenue dans la question 2 après inversion de la loi koschmeider 
+I02= Is2.*(redim2-voile2)./(Is2 - voile2);
+figure();
+subplot(2,2,1);
+imshow(redim2) % Afficher l'image originale F02
+title('IMAGE originale F02')
+subplot(2,2,2);
+imshow(I02) % Afficher l'image  F02 après restauration des contrastes
+title('IMAGE F02 après restauration des contrastes');
+% On a ainsi reussi à restaurer notre image mais on doit augmenter de son
+% intensité car elle est un peu sombre comparé à l'originale (c'est ce
+% qu'on va faire dans la question 6).
+
+
+% On appliquea donc une puIs2sance sur l'intensité (transformation gamma) afin de
+%corriger l'assombrIssement de l'image:
+
+Im_gam2=I02.*1.5; % On augemntera l'intensité de notre image restaurée avec un coefficient 
+%Gamma= 1.5 
+
+figure();
+subplot(2,2,1);
+imshow(I02) % % Afficher l'image  F02 après restauration des contrastes
+title('IMAGE F02 restaurée')
+subplot(2,2,2)
+imshow(Im_gam2);% Afficher notre image restaurée augmentée en intensité avec la transformation
+% gamma
+title('Image F02 restaurée avec gamma ');
+%%
+
+%%%%%%%%%%%% Q9) 
+
+% On adapte la restauration pour traiter l'image en couleurs "F03.png”, en considérant chaque 
+% composante couleur comme indépendante :
+Im_orig3= imread('F03.png'); % Pour Lire notre quatrième image originale à partir du fichier graphique.
+filtre=15; % On désigne la taille d'un filtre qui nous permettera de filtrer notre image car ici on a bien une image en couleurs
+% ce qui veut dire à trois dimensions dans le plan RVB.
+
+% imshow suppose par défaut que ses entrées sont [0-1]. Ainsi, lorsqu'on lui lui donne des données [0-255],
+% toutes les valeurs au-dessus de 1 sont affichées en blanc. Il existe une solution simple:
+redim3=double(Im_orig3)/255 ;   %  pour redimensionner les intensités à [0, 1]
+
+
+% On va donc appliquer notre filtre median pour chacuns des composantes ( canaux) du
+% plan RVB correspondant respectivement au ROUGE, VERT, et BLEU.
+
+RVB(:,:,3)=medfilt2(redim3(:,:,3), [filtre, filtre], 'symmetric'); % troisième plan ou composante d'image qui correspond à bleu
+RVB(:,:,2)=medfilt2(redim3(:,:,2), [filtre, filtre], 'symmetric'); % deuxième plan ou composante d'image qui correspond au vert 
+RVB(:,:,1)=medfilt2(redim3(:,:,1), [filtre, filtre], 'symmetric'); % premier plan ou composante d'image qui correspond au Rouge. 
+
+
+% L'intensité du ciel qui est prise en compte de 200 premières lignes et
+% 300 premières colonnes sur chacun des trois plans RVB:
+
+% Is3=redim3(200,300,3); 
+Is3=1  % ( à appliquer durant la question 10 )
+
+A3=min(RVB,redim3); % Calculer le minimum entre l'image Lisssée et l'image originale
+B3=min(A3,Is3*ones(size(A3)));
+voile3=0.95*B3; % Notre voile est approximativement 95% d ece minimum.
+I03=(redim3 - voile3)./ (1- (voile3/Is3))*1.6;
+figure();
+subplot(1,2,1);
+imshow(redim3); %  % Afficher notre image originale non
+%  restaurée.
+title('Notre image F03 originale ');
+subplot(1,2,2);
+imshow(I03);
+title ('IMAGE F03 EN COULEUR RESTAUREE');
+
+figure();
+imshow(voile3)
+title('voile image colorée ')
+%%
+
+%%%%%%%%%%%%%%% Q10)
+
+% On essaye donc de restorer l'image en considérant que le brouillard est
+% completement blanc:
+
+% On considère l'intensité du ciel Is3=1, on obtient donc;
